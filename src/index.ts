@@ -41,8 +41,7 @@ export {
 } from './core/query-logger';
 
 // Export Framework Adapters
-export { elysiaLogger } from './adapters/elysia';
-export type { ElysiaLoggerOptions } from './adapters/elysia';
+
 export { honoLogger, honoErrorHandler } from './adapters/hono';
 export type { HonoLoggerOptions } from './adapters/hono';
 export { expressLogger, expressErrorHandler } from './adapters/express';

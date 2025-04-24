@@ -62,11 +62,15 @@ Rather than duplicating this code across repositories, we should extract it into
   - [ ] Configuration options
   - [ ] Framework-specific integration guides
   - [ ] Advanced usage examples
+  - [ ] Add coverage badge to README
+  - [x] Add documentation for Query Logger adapter
+  - [ ] Add links to CONTRIBUTING.md and CODE_OF_CONDUCT.md in README
 
 ### 6. Testing
 
 - [x] Write initial unit tests for core logger functionality (`src/core/__tests__/logger.service.test.ts`)
 - [x] Create integration tests for framework adapters (Express, Hono)
+- [x] Create integration tests for Generic adapter
 - [x] Set up initial Jest configuration (`jest.config.cjs` for ESM)
 - [x] Resolved initial testing setup issues (tests are passing)
 - [x] Set up GitHub Actions for CI/CD
