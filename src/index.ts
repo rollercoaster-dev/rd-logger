@@ -4,7 +4,6 @@
  */
 
 import { Logger } from './core/logger.service';
-import { DEFAULT_LOGGER_CONFIG } from './core/logger.config';
 
 // Export core logger class
 export { Logger } from './core/logger.service';

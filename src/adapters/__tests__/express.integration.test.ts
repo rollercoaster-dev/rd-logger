@@ -3,7 +3,7 @@
 import express from 'express';
 import request from 'supertest';
 import { expressLogger } from '../express';
-import chalk from 'chalk';
+
 
 // Mock chalk to disable color codes in tests for easier string matching
 jest.mock('chalk', () => {

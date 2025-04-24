@@ -1,4 +1,4 @@
-import type { MiddlewareHandler, Context, Next } from 'hono';
+import type { Context, MiddlewareHandler } from 'hono';
 import { Logger } from '../core/logger.service';
 import { type LoggerConfig } from '../core/logger.config';
 import {

@@ -3,7 +3,7 @@
 A neurodivergent-friendly logger for Rollercoaster.dev projects.
 
 [![CI](https://github.com/rollercoaster-dev/neuro-friendly-logger/actions/workflows/ci.yml/badge.svg)](https://github.com/rollercoaster-dev/neuro-friendly-logger/actions/workflows/ci.yml)
-[![Coverage](https://img.shields.io/codecov/c/github/rollercoaster-dev/neuro-friendly-logger/main.svg)](https://codecov.io/gh/rollercoaster-dev/neuro-friendly-logger)
+[![PR Checks](https://github.com/rollercoaster-dev/neuro-friendly-logger/actions/workflows/pr-checks.yml/badge.svg)](https://github.com/rollercoaster-dev/neuro-friendly-logger/actions/workflows/pr-checks.yml)
 
 ## Installation
 

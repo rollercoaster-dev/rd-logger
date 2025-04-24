@@ -3,7 +3,7 @@
 import { runWithGenericContext } from '../generic';
 import { Logger } from '../../core/logger.service';
 import { getRequestStore } from '../../core/request-context';
-import chalk from 'chalk';
+
 
 // Mock chalk
 jest.mock('chalk', () => {

@@ -4,7 +4,7 @@ import { Hono } from 'hono';
 import { serve } from '@hono/node-server';
 import request from 'supertest';
 import { honoLogger } from '../hono';
-import chalk from 'chalk';
+
 
 // Mock chalk to disable color codes in tests for easier string matching
 jest.mock('chalk', () => {
