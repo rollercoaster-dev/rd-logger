@@ -43,8 +43,11 @@ export {
 // Export Framework Adapters
 export { elysiaLogger } from './adapters/elysia';
 export type { ElysiaLoggerOptions } from './adapters/elysia';
+export { honoLogger, honoErrorHandler } from './adapters/hono';
+export type { HonoLoggerOptions } from './adapters/hono';
+export { expressLogger, expressErrorHandler } from './adapters/express';
+export type { ExpressLoggerOptions } from './adapters/express';
+export { runWithGenericContext } from './adapters/generic';
+export type { GenericContextOptions } from './adapters/generic';
 
 // TODO: Export other framework adapters once implemented
-// export * from './adapters/hono';
-// export * from './adapters/express';
-// export * from './adapters/generic';

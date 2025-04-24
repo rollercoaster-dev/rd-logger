@@ -45,7 +45,7 @@ export interface LoggerConfig {
 export const DEFAULT_LOGGER_CONFIG: LoggerConfig = {
   level: (process.env.LOG_LEVEL as LogLevel) || 'info', // Default level
   prettyPrint: process.env.NODE_ENV !== 'production', // Pretty print in dev, plain in prod
-  colorize: process.stdout.isTTY, // Only colorize if output is a TTY
+  colorize: true, // Only colorize if output is a TTY
   includeStackTrace: process.env.NODE_ENV !== 'production', // Show stack trace in dev
   logToFile: false, // Default to console logging
   logFilePath: './app.log', // Default log file path

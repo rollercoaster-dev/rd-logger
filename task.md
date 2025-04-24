@@ -23,56 +23,58 @@ Rather than duplicating this code across repositories, we should extract it into
 
 ### 1. Create a New Package Repository
 
-1. Create a new GitHub repository named `rd-logger` under the rollercoaster-dev organization
-2. Initialize the repository with a basic package structure that includes source files, tests, configuration files, and documentation
+- [x] Create a new GitHub repository named `rd-logger` under the rollercoaster-dev organization
+- [x] Initialize the repository with a basic package structure that includes source files, tests, configuration files, and documentation
 
 ### 2. Extract and Adapt the Logger Code
 
-1. Extract the core logger implementation from `src/utils/logging/logger.service.ts`
-2. Extract the request context middleware from `src/utils/logging/request-context.middleware.ts`
-3. Extract the query logger from `src/infrastructure/database/utils/query-logger.service.ts`
-4. Adapt the code to work as a standalone package:
-   - Remove dependencies on the application's config system
-   - Create a configuration interface for the logger
-   - Implement sensible defaults
-   - Make framework-specific parts (like Elysia middleware) optional or pluggable
+- [x] Extract the core logger implementation from `src/utils/logging/logger.service.ts`
+- [x] Extract the request context middleware from `src/utils/logging/request-context.middleware.ts` (Now in `src/core/request-context.ts`)
+- [x] Extract the query logger from `src/infrastructure/database/utils/query-logger.service.ts` (Now in `src/core/query-logger.ts`)
+- [x] Adapt the code to work as a standalone package:
+  - [x] Remove dependencies on the application's config system
+  - [x] Create a configuration interface for the logger (`src/core/logger.config.ts`)
+  - [x] Implement sensible defaults
+  - [x] Make framework-specific parts (like Elysia middleware) optional or pluggable
 
 ### 3. Create Framework-Specific Adapters
 
-1. Create adapters for different frameworks:
-   - Elysia adapter (for Bun applications)
-   - Hono adapter (for the rd-monolith)
-   - Express adapter (for potential Express applications)
-   - Generic adapter (for non-web applications)
+- [x] Create adapters for different frameworks:
+  - [x] Elysia adapter (for Bun applications) (`src/adapters/elysia.ts`)
+  - [x] Hono adapter (for the rd-monolith) (`src/adapters/hono.ts`)
+  - [x] Express adapter (for potential Express applications) (`src/adapters/express.ts`)
+  - [x] Generic adapter (for non-web applications) (`src/adapters/generic.ts`)
 
 ### 4. Package Configuration
 
-1. Set up package.json with:
-   - Dependencies (chalk, etc.)
-   - Build scripts
-   - TypeScript configuration
-   - Export configuration
-2. Configure the package to support both ESM and CommonJS
+- [x] Set up package.json with:
+  - [x] Dependencies (chalk, etc.)
+  - [x] Build scripts
+  - [x] TypeScript configuration
+  - [x] Export configuration
+- [x] Configure the package to support ESM (Added `"type": "module"`, updated `tsconfig.json`, `jest.config.cjs`)
 
 ### 5. Documentation
 
-1. Create comprehensive documentation:
-   - Installation instructions
-   - Basic usage examples
-   - Configuration options
-   - Framework-specific integration guides
-   - Advanced usage examples
+- [ ] Create comprehensive documentation:
+  - [ ] Installation instructions
+  - [ ] Basic usage examples
+  - [ ] Configuration options
+  - [ ] Framework-specific integration guides
+  - [ ] Advanced usage examples
 
 ### 6. Testing
 
-1. Write unit tests for all logger functionality
-2. Create integration tests for framework adapters
-3. Set up GitHub Actions for CI/CD
+- [x] Write initial unit tests for core logger functionality (`src/core/__tests__/logger.service.test.ts`)
+- [x] Create integration tests for framework adapters (Express, Hono)
+- [x] Set up initial Jest configuration (`jest.config.cjs` for ESM)
+- [x] Resolved initial testing setup issues (tests are passing)
+- [x] Set up GitHub Actions for CI/CD
 
 ### 7. Publishing
 
-1. Set up npm publishing workflow
-2. Publish the package to npm under the @rollercoaster-dev organization
+- [ ] Set up npm publishing workflow
+- [ ] Publish the package to npm under the @rollercoaster-dev organization
 
 ## Implementation Details
 

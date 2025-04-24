@@ -1,0 +1,52 @@
+name: Create Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., 1.0.0)'
+        required: true
+      release_notes:
+        description: 'Release notes'
+        required: true
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'pnpm'
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 8
+          run_install: false
+      - name: Install dependencies
+        run: pnpm install
+      - name: Run tests
+        run: pnpm test
+      - name: Update version
+        run: |
+          npm version ${{ github.event.inputs.version }} --no-git-tag-version
+      - name: Create Pull Request
+        id: cpr
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'chore(release): ${{ github.event.inputs.version }}'
+          title: 'Release ${{ github.event.inputs.version }}'
+          body: |
+            ## Release ${{ github.event.inputs.version }}
+            
+            ${{ github.event.inputs.release_notes }}
+          branch: release-${{ github.event.inputs.version }}
+          base: main
+      - name: Create Release
+        if: steps.cpr.outputs.pull-request-operation == 'created'
+        run: |
+          echo "Pull request created: ${{ steps.cpr.outputs.pull-request-url }}"
+          echo "Once the PR is merged, create a new release on GitHub with tag v${{ github.event.inputs.version }}"
