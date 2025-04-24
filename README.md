@@ -56,6 +56,33 @@ This project uses GitHub Actions for continuous integration and deployment:
 - **PR Checks**: Additional checks that run on pull requests
 - **Publish Workflow**: Automatically publishes the package to npm when a new release is created
 
+### Versioning and Releases
+
+This project follows [Semantic Versioning](https://semver.org/) and uses [Conventional Commits](https://www.conventionalcommits.org/) for commit messages.
+
+#### Creating a Release
+
+To create a new release, you can use one of the following commands:
+
+```bash
+# Create a patch release (0.0.x)
+pnpm release:patch
+
+# Create a minor release (0.x.0)
+pnpm release:minor
+
+# Create a major release (x.0.0)
+pnpm release:major
+
+# Create a prerelease (alpha)
+pnpm release:alpha
+
+# Create a prerelease (beta)
+pnpm release:beta
+```
+
+Alternatively, you can use the GitHub Actions workflow "Create Release" to create a new release directly from GitHub.
+
 ## License
 
 MIT
