@@ -1,6 +1,6 @@
-# Contributing to Neuro-Friendly Logger
+# Contributing to RD Logger
 
-Thank you for your interest in contributing to the Neuro-Friendly Logger package! This document provides guidelines and instructions for contributing.
+Thank you for your interest in contributing to the RD Logger package! This document provides guidelines and instructions for contributing.
 
 ## Table of Contents
 
@@ -30,8 +30,8 @@ This project adheres to a Code of Conduct that all contributors are expected to 
 1. Fork the repository on GitHub
 2. Clone your fork locally:
    ```bash
-   git clone https://github.com/YOUR-USERNAME/neuro-friendly-logger.git
-   cd neuro-friendly-logger
+   git clone https://github.com/YOUR-USERNAME/rd-logger.git
+   cd rd-logger
    ```
 3. Install dependencies:
    ```bash
@@ -39,7 +39,7 @@ This project adheres to a Code of Conduct that all contributors are expected to 
    ```
 4. Add the original repository as an upstream remote:
    ```bash
-   git remote add upstream https://github.com/rollercoaster-dev/neuro-friendly-logger.git
+   git remote add upstream https://github.com/rollercoaster-dev/rd-logger.git
    ```
 
 ## Development Workflow
@@ -146,4 +146,4 @@ If you have any questions or need help, please:
 2. Open a new issue with the "question" label
 3. Reach out to the maintainers
 
-Thank you for contributing to Neuro-Friendly Logger!
+Thank you for contributing to RD Logger!

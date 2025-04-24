@@ -9,6 +9,6 @@
     {"type": "perf", "section": "Performance Improvements"},
     {"type": "test", "hidden": true}
   ],
-  "commitUrlFormat": "https://github.com/rollercoaster-dev/neuro-friendly-logger/commit/{{hash}}",
-  "compareUrlFormat": "https://github.com/rollercoaster-dev/neuro-friendly-logger/compare/{{previousTag}}...{{currentTag}}"
+  "commitUrlFormat": "https://github.com/rollercoaster-dev/rd-logger/commit/{{hash}}",
+  "compareUrlFormat": "https://github.com/rollercoaster-dev/rd-logger/compare/{{previousTag}}...{{currentTag}}"
 }

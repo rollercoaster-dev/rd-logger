@@ -2,8 +2,8 @@
 
 A neurodivergent-friendly logger for Rollercoaster.dev projects.
 
-[![CI](https://github.com/rollercoaster-dev/neuro-friendly-logger/actions/workflows/ci.yml/badge.svg)](https://github.com/rollercoaster-dev/neuro-friendly-logger/actions/workflows/ci.yml)
-[![PR Checks](https://github.com/rollercoaster-dev/neuro-friendly-logger/actions/workflows/pr-checks.yml/badge.svg)](https://github.com/rollercoaster-dev/neuro-friendly-logger/actions/workflows/pr-checks.yml)
+[![CI](https://github.com/rollercoaster-dev/rd-logger/actions/workflows/ci.yml/badge.svg)](https://github.com/rollercoaster-dev/rd-logger/actions/workflows/ci.yml)
+[![PR Checks](https://github.com/rollercoaster-dev/rd-logger/actions/workflows/pr-checks.yml/badge.svg)](https://github.com/rollercoaster-dev/rd-logger/actions/workflows/pr-checks.yml)
 
 ## Installation
 

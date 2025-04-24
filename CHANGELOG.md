@@ -7,12 +7,12 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Features
 
-* add project docs and remove Elysia adapter ([d44f4d4](https://github.com/rollercoaster-dev/neuro-friendly-logger/commit/d44f4d419966417e8fe6ab1c99f738d8499def1a))
+* add project docs and remove Elysia adapter ([d44f4d4](https://github.com/rollercoaster-dev/rd-logger/commit/d44f4d419966417e8fe6ab1c99f738d8499def1a))
 
 
 ### Bug Fixes
 
-* correct order of steps in GitHub Actions workflows to install pnpm before using it ([0b1332d](https://github.com/rollercoaster-dev/neuro-friendly-logger/commit/0b1332d5f71458aa74ab54000988250b969c8e89))
+* correct order of steps in GitHub Actions workflows to install pnpm before using it ([0b1332d](https://github.com/rollercoaster-dev/rd-logger/commit/0b1332d5f71458aa74ab54000988250b969c8e89))
 
 ## [0.1.0] - 2025-04-24
 

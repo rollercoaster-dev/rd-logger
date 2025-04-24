@@ -27,7 +27,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rollercoaster-dev/neuro-friendly-logger.git"
+    "url": "git+https://github.com/rollercoaster-dev/rd-logger.git"
   },
   "keywords": [
     "logger",
@@ -40,9 +40,9 @@
   "author": "Rollercoaster.dev <team@rollercoaster.dev>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/rollercoaster-dev/neuro-friendly-logger/issues"
+    "url": "https://github.com/rollercoaster-dev/rd-logger/issues"
   },
-  "homepage": "https://github.com/rollercoaster-dev/neuro-friendly-logger#readme",
+  "homepage": "https://github.com/rollercoaster-dev/rd-logger#readme",
   "devDependencies": {
     "@commitlint/cli": "^19.8.0",
     "@commitlint/config-conventional": "^19.8.0",
