@@ -2,7 +2,7 @@
 
 A neurodivergent-friendly logger for Rollercoaster.dev projects.
 
-[![CI](https://github.com/rollercoaster-dev/rd-logger/actions/workflows/ci.yml/badge.svg)](https://github.com/rollercoaster-dev/rd-logger/actions/workflows/ci.yml)
+[![CI](https://github.com/rollercoaster-dev/neuro-friendly-logger/actions/workflows/ci.yml/badge.svg)](https://github.com/rollercoaster-dev/neuro-friendly-logger/actions/workflows/ci.yml)
 
 ## Installation
 
