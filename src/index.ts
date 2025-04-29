@@ -46,6 +46,10 @@ export type { ConsoleTransportOptions, FileTransportOptions } from './core/trans
 // Export Formatters
 export { Formatter, JsonFormatter, TextFormatter } from './core/formatters';
 
+// Export Sensitive Data Protection
+export { SensitiveValue, SensitiveLoggingApproval } from './core/sensitive';
+export { containsSensitiveData, redactSensitiveData, SENSITIVE_PATTERNS } from './core/sensitive';
+
 // Export Utilities
 export { formatDate, formatError, safeStringify } from './core/utils';
 

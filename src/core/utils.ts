@@ -1,17 +1,33 @@
+import { SensitiveValue } from './sensitive';
+import { containsSensitiveData, redactSensitiveData } from './sensitive';
+
 /**
- * Safely stringify objects for logging, handling circular references
+ * Safely stringify objects for logging, handling circular references and sensitive data
  * @param obj Object to stringify
+ * @param detectPatterns Whether to detect and redact sensitive data patterns
  * @returns String representation of the object
  */
-export function safeStringify(obj: any): string {
+export function safeStringify(obj: any, detectPatterns = true): string {
   const seen = new Set();
   return JSON.stringify(obj, (_key, value) => {
+    // Handle circular references
     if (typeof value === 'object' && value !== null) {
       if (seen.has(value)) {
         return '[Circular]';
       }
       seen.add(value);
+
+      // Handle SensitiveValue instances
+      if (value instanceof SensitiveValue) {
+        return value.toString();
+      }
     }
+
+    // Handle string values that might contain sensitive data
+    if (detectPatterns && typeof value === 'string' && containsSensitiveData(value)) {
+      return redactSensitiveData(value);
+    }
+
     return value;
   }, 2);
 }

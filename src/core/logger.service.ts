@@ -6,7 +6,8 @@ import {
 } from './logger.config';
 import { Transport, ConsoleTransport, FileTransport } from './transports';
 import { Formatter, TextFormatter } from './formatters';
-import { formatError } from './utils';
+import { formatError, safeStringify } from './utils';
+import { SensitiveLoggingApproval } from './sensitive';
 
 /**
  * Enhanced neuro-friendly logger class
@@ -119,6 +120,75 @@ export class Logger {
    */
   public logError(msg: string, error: Error, additionalContext: Record<string, any> = {}): void {
     this.log('error', msg, { ...additionalContext, error });
+  }
+
+  /**
+   * Explicitly log sensitive data with approval information
+   * This method should only be used in exceptional circumstances where logging sensitive data is necessary
+   * @param level Log level
+   * @param message Log message
+   * @param data Data containing sensitive information
+   * @param approval Approval information for logging sensitive data
+   */
+  public logWithSensitiveData(
+    level: LogLevel,
+    message: string,
+    data: Record<string, any>,
+    approval: SensitiveLoggingApproval
+  ): void {
+    // Validate approval
+    if (!approval.reason || !approval.approvedBy) {
+      this.warn('Attempted to log sensitive data without proper approval', {
+        message: 'Missing required approval information. Sensitive data will not be logged.'
+      });
+      return;
+    }
+
+    // Check if approval has expired
+    if (approval.expiresAt && new Date() > approval.expiresAt) {
+      this.warn('Attempted to log sensitive data with expired approval', {
+        message: 'Approval has expired. Sensitive data will not be logged.',
+        expiredAt: approval.expiresAt
+      });
+      return;
+    }
+
+    // Add approval information to the context
+    const contextWithApproval = {
+      ...data,
+      __sensitive_data_approval__: {
+        reason: approval.reason,
+        approvedBy: approval.approvedBy,
+        approvedAt: new Date().toISOString(),
+        expiresAt: approval.expiresAt ? approval.expiresAt.toISOString() : undefined
+      }
+    };
+
+    // Log with a warning prefix to make it stand out
+    const warningPrefix = '⚠️ SENSITIVE DATA ⚠️ ';
+    this.log(level, `${warningPrefix}${message}`, contextWithApproval);
+  }
+
+  /**
+   * Convenience method for logging sensitive data with info level
+   */
+  public infoWithSensitiveData(
+    message: string,
+    data: Record<string, any>,
+    approval: SensitiveLoggingApproval
+  ): void {
+    this.logWithSensitiveData('info', message, data, approval);
+  }
+
+  /**
+   * Convenience method for logging sensitive data with error level
+   */
+  public errorWithSensitiveData(
+    message: string,
+    data: Record<string, any>,
+    approval: SensitiveLoggingApproval
+  ): void {
+    this.logWithSensitiveData('error', message, data, approval);
   }
 
   /**
