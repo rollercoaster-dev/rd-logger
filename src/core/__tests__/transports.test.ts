@@ -1,7 +1,10 @@
 /// <reference types="jest" />
 
 import { Logger } from '../logger.service';
+// These imports are used in the test setup
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { ConsoleTransport, FileTransport } from '../transports';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { JsonFormatter } from '../formatters';
 import fs from 'fs';
 import path from 'path';
@@ -33,7 +36,7 @@ describe('Logger Transports', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
-    
+
     // Clean up test log file if it exists
     if (fs.existsSync(TEST_LOG_FILE)) {
       fs.unlinkSync(TEST_LOG_FILE);
@@ -42,7 +45,7 @@ describe('Logger Transports', () => {
 
   afterEach(() => {
     consoleSpy.mockRestore();
-    
+
     // Clean up test log file
     if (fs.existsSync(TEST_LOG_FILE)) {
       fs.unlinkSync(TEST_LOG_FILE);
@@ -60,11 +63,11 @@ describe('Logger Transports', () => {
       name: 'mock',
       log: jest.fn(),
     };
-    
+
     const logger = new Logger({
       transports: [mockTransport],
     });
-    
+
     logger.info('Test message');
     expect(mockTransport.log).toHaveBeenCalled();
     expect(consoleSpy).not.toHaveBeenCalled(); // Default console transport should not be used
@@ -76,20 +79,20 @@ describe('Logger Transports', () => {
       name: 'mock',
       log: jest.fn(),
     };
-    
+
     // Add transport
     logger.addTransport(mockTransport);
     logger.info('Test with mock transport');
     expect(mockTransport.log).toHaveBeenCalled();
     expect(consoleSpy).toHaveBeenCalled();
-    
+
     consoleSpy.mockClear();
     mockTransport.log.mockClear();
-    
+
     // Remove transport
     const removed = logger.removeTransport('mock');
     expect(removed).toBe(true);
-    
+
     logger.info('Test without mock transport');
     expect(mockTransport.log).not.toHaveBeenCalled();
     expect(consoleSpy).toHaveBeenCalled();
@@ -100,15 +103,15 @@ describe('Logger Transports', () => {
       logToFile: true,
       logFilePath: TEST_LOG_FILE,
     });
-    
+
     logger.info('Test file logging');
-    
+
     // Clean up
     logger.cleanup();
-    
+
     // Wait for file to be written
     await new Promise(resolve => setTimeout(resolve, 100));
-    
+
     // Check if file exists and contains the log message
     expect(fs.existsSync(TEST_LOG_FILE)).toBe(true);
     const fileContent = fs.readFileSync(TEST_LOG_FILE, 'utf8');
@@ -120,17 +123,17 @@ describe('Logger Transports', () => {
       name: 'mock',
       log: jest.fn(),
     };
-    
+
     const logger = new Logger({
       level: 'warn',
       transports: [mockTransport],
     });
-    
+
     logger.debug('Debug message'); // Should be filtered out
     logger.info('Info message');   // Should be filtered out
     logger.warn('Warning message'); // Should be logged
     logger.error('Error message');  // Should be logged
-    
+
     expect(mockTransport.log).toHaveBeenCalledTimes(2);
     expect(mockTransport.log).not.toHaveBeenCalledWith('debug', 'Debug message', expect.anything(), expect.anything());
     expect(mockTransport.log).not.toHaveBeenCalledWith('info', 'Info message', expect.anything(), expect.anything());
@@ -138,21 +141,21 @@ describe('Logger Transports', () => {
 
   it('should update transports when configuration changes', () => {
     const logger = new Logger();
-    
+
     // Initially only console transport
     logger.info('Console only');
     expect(consoleSpy).toHaveBeenCalledTimes(1);
     consoleSpy.mockClear();
-    
+
     // Enable file logging
     logger.configure({
       logToFile: true,
       logFilePath: TEST_LOG_FILE,
     });
-    
+
     logger.info('Console and file');
     expect(consoleSpy).toHaveBeenCalledTimes(1);
-    
+
     // Clean up
     logger.cleanup();
   });

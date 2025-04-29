@@ -6,7 +6,7 @@ import {
 } from './logger.config';
 import { Transport, ConsoleTransport, FileTransport } from './transports';
 import { Formatter, TextFormatter } from './formatters';
-import { formatError, safeStringify } from './utils';
+import { formatError } from './utils';
 import { SensitiveLoggingApproval } from './sensitive';
 
 /**
@@ -68,6 +68,9 @@ export class Logger {
    */
   public log(level: LogLevel, message: string, context: Record<string, any> = {}): void {
     // Check if this log level should be shown based on configuration
+    // In LOG_LEVEL_PRIORITY, higher values mean less verbose (debug=0, fatal=4)
+    // So we only log if the message level value is >= the configured level value
+    // For example, if config.level is 'info' (1), we log 'info' (1), 'warn' (2), 'error' (3), 'fatal' (4), but not 'debug' (0)
     if (LOG_LEVEL_PRIORITY[level] < LOG_LEVEL_PRIORITY[this.config.level]) {
       return;
     }
@@ -196,6 +199,8 @@ export class Logger {
    * @param options Partial configuration options to update
    */
   public configure(options: Partial<LoggerConfig>): void {
+    // We don't need oldConfig for now, but it might be useful for future comparisons
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const oldConfig = { ...this.config };
     this.config = { ...this.config, ...options };
 
