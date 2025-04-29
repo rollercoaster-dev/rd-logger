@@ -39,8 +39,17 @@ export {
   DEFAULT_QUERY_LOGGER_CONFIG
 } from './core/query-logger';
 
-// Export Framework Adapters
+// Export Transports
+export { Transport, ConsoleTransport, FileTransport } from './core/transports';
+export type { ConsoleTransportOptions, FileTransportOptions } from './core/transports';
 
+// Export Formatters
+export { Formatter, JsonFormatter, TextFormatter } from './core/formatters';
+
+// Export Utilities
+export { formatDate, formatError, safeStringify } from './core/utils';
+
+// Export Framework Adapters
 export { honoLogger, honoErrorHandler } from './adapters/hono';
 export type { HonoLoggerOptions } from './adapters/hono';
 export { expressLogger, expressErrorHandler } from './adapters/express';
