@@ -54,8 +54,18 @@ export class Logger {
         const fileTransport = new FileTransport({
           filePath: this.config.logFilePath,
         });
-        fileTransport.initialize();
-        this.transports.push(fileTransport);
+
+        try {
+          fileTransport.initialize();
+          this.transports.push(fileTransport);
+        } catch (error) {
+          console.warn(`Failed to initialize file transport: ${error instanceof Error ? error.message : String(error)}`);
+          // Log a warning using the console transport that's already set up
+          this.warn('Failed to initialize file transport', {
+            error: error instanceof Error ? error.message : String(error),
+            filePath: this.config.logFilePath
+          });
+        }
       }
     }
   }
