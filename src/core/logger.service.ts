@@ -1,229 +1,106 @@
-import chalk from 'chalk';
-import fs from 'fs';
-import path from 'path';
 import {
   LogLevel,
   LoggerConfig,
   DEFAULT_LOGGER_CONFIG,
   LOG_LEVEL_PRIORITY,
-  DEFAULT_LEVEL_COLORS,
-  DEFAULT_LEVEL_ICONS
 } from './logger.config';
-
-/**
- * Safely stringify objects for logging, handling circular references
- * @param obj Object to stringify
- * @returns String representation of the object
- */
-function safeStringify(obj: any): string {
-  const seen = new Set();
-  return JSON.stringify(obj, (_key, value) => {
-    if (typeof value === 'object' && value !== null) {
-      if (seen.has(value)) {
-        return '[Circular]';
-      }
-      seen.add(value);
-    }
-    return value;
-  }, 2);
-}
-
-/**
- * Format error objects for logging, including stack traces if configured
- * @param error Error object
- * @param config Logger configuration
- * @returns Formatted error context
- */
-function formatError(error: Error, config: LoggerConfig): Record<string, string> {
-  const errorContext: Record<string, string> = {
-    message: error.message
-  };
-
-  if (config.includeStackTrace && error.stack) {
-    // Format stack trace for better readability
-    errorContext.stack = error.stack
-      .split('\n')
-      .slice(1) // Remove the first line (error message)
-      .map(line => line.trim())
-      .join('\n');
-  }
-
-  return errorContext;
-}
-
-/**
- * Ensure directory exists for log file
- */
-function ensureLogDirectoryExists(filePath: string): void {
-  const logDir = path.dirname(filePath);
-  if (!fs.existsSync(logDir)) {
-    fs.mkdirSync(logDir, { recursive: true });
-  }
-}
-
-/**
- * Get a relative time string (e.g., "just now", "2 minutes ago")
- * @param date Date to format
- * @returns Relative time string or null if the time difference is too large
- */
-function getRelativeTimeString(date: Date): string | null {
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffSeconds = Math.floor(diffMs / 1000);
-
-  // Only show relative time for recent events (within the last hour)
-  if (diffSeconds < 5) {
-    return 'just now';
-  } else if (diffSeconds < 60) {
-    return `${diffSeconds} seconds ago`;
-  } else if (diffSeconds < 3600) {
-    const minutes = Math.floor(diffSeconds / 60);
-    return `${minutes} ${minutes === 1 ? 'minute' : 'minutes'} ago`;
-  }
-
-  return null; // Not recent enough for relative time
-}
-
-/**
- * Format a date in a human-readable format
- * @param date Date to format
- * @param use24HourFormat Whether to use 24-hour format
- * @param useRelativeTime Whether to use relative time for recent events
- * @returns Formatted date string
- */
-function formatDate(date: Date, use24HourFormat = true, useRelativeTime = true): string {
-  // Try relative time first if enabled
-  if (useRelativeTime) {
-    const relativeTime = getRelativeTimeString(date);
-    if (relativeTime) {
-      return relativeTime;
-    }
-  }
-
-  // Otherwise, format as date and time
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  const month = months[date.getMonth()];
-  const day = date.getDate();
-  const hours = date.getHours();
-  const minutes = date.getMinutes().toString().padStart(2, '0');
-  const seconds = date.getSeconds().toString().padStart(2, '0');
-  const milliseconds = date.getMilliseconds().toString().padStart(3, '0');
-
-  if (use24HourFormat) {
-    // 24-hour format
-    return `${month} ${day}, ${hours.toString().padStart(2, '0')}:${minutes}:${seconds}.${milliseconds}`;
-  } else {
-    // 12-hour format with AM/PM
-    const ampm = hours >= 12 ? 'PM' : 'AM';
-    const hour12 = hours % 12 || 12;
-    return `${month} ${day}, ${hour12}:${minutes}:${seconds}.${milliseconds} ${ampm}`;
-  }
-}
+import { Transport, ConsoleTransport, FileTransport } from './transports';
+import { Formatter, TextFormatter } from './formatters';
+import { formatError } from './utils';
+import { SensitiveLoggingApproval } from './sensitive';
 
 /**
  * Enhanced neuro-friendly logger class
  */
 export class Logger {
   private config: LoggerConfig;
-  private levelColors: Record<LogLevel, (text: string) => string>;
-  private levelIcons: Record<LogLevel, string>;
+  private transports: Transport[] = [];
+  private formatter: Formatter;
 
   constructor(options?: Partial<LoggerConfig>) {
     this.config = { ...DEFAULT_LOGGER_CONFIG, ...options };
-    // Merge default and custom colors/icons
-    this.levelColors = { ...DEFAULT_LEVEL_COLORS, ...(this.config.levelColors || {}) };
-    this.levelIcons = { ...DEFAULT_LEVEL_ICONS, ...(this.config.levelIcons || {}) };
+    this.formatter = this.config.formatter || new TextFormatter();
 
-    // Ensure log directory exists immediately if file logging is enabled
-    if (this.config.logToFile) {
-      try {
-        ensureLogDirectoryExists(this.config.logFilePath);
-      } catch (error: any) {
-        // Log error to console if directory creation fails
-        console.error(`Failed to create log directory '${path.dirname(this.config.logFilePath)}': ${error.message}`);
-        this.config.logToFile = false; // Disable file logging
-      }
-    }
+    // Initialize transports
+    this.initializeTransports();
   }
 
   /**
-   * Write log entry to file if configured
-   * @param entry Log entry string
+   * Initialize transports based on configuration
    */
-  private writeToLogFile(entry: string): void {
-    if (this.config.logToFile) {
-      try {
-        // We assume directory exists from constructor check, but double-check write permissions might fail
-        fs.appendFileSync(this.config.logFilePath, entry + '\n');
-      } catch (error: any) {
-        console.error(`Failed to write to log file '${this.config.logFilePath}': ${error.message}`);
-        // Optionally disable future file logging attempts for this instance?
-        // this.config.logToFile = false;
+  private initializeTransports(): void {
+    // Clear existing transports
+    this.transports = [];
+
+    // Use custom transports if provided
+    if (this.config.transports && this.config.transports.length > 0) {
+      this.transports = [...this.config.transports];
+    } else {
+      // Otherwise, set up default transports based on config
+      // Always add console transport by default
+      this.transports.push(
+        new ConsoleTransport({
+          prettyPrint: this.config.prettyPrint,
+          colorize: this.config.colorize,
+          use24HourFormat: this.config.use24HourFormat,
+          useRelativeTime: this.config.useRelativeTime,
+          levelColors: this.config.levelColors,
+          levelIcons: this.config.levelIcons,
+        })
+      );
+
+      // Add file transport if enabled
+      if (this.config.logToFile) {
+        const fileTransport = new FileTransport({
+          filePath: this.config.logFilePath,
+        });
+
+        try {
+          fileTransport.initialize();
+          this.transports.push(fileTransport);
+        } catch (error) {
+          console.warn(`Failed to initialize file transport: ${error instanceof Error ? error.message : String(error)}`);
+          // Log a warning using the console transport that's already set up
+          this.warn('Failed to initialize file transport', {
+            error: error instanceof Error ? error.message : String(error),
+            filePath: this.config.logFilePath
+          });
+        }
       }
     }
   }
 
   /**
-   * Main logging function with neuro-friendly formatting
+   * Main logging function
    * @param level Log level
    * @param message Log message
    * @param context Additional context (optional)
    */
   public log(level: LogLevel, message: string, context: Record<string, any> = {}): void {
     // Check if this log level should be shown based on configuration
+    // In LOG_LEVEL_PRIORITY, higher values mean less verbose (debug=0, fatal=4)
+    // So we only log if the message level value is >= the configured level value
+    // For example, if config.level is 'info' (1), we log 'info' (1), 'warn' (2), 'error' (3), 'fatal' (4), but not 'debug' (0)
     if (LOG_LEVEL_PRIORITY[level] < LOG_LEVEL_PRIORITY[this.config.level]) {
       return;
     }
-
-    const icon = this.levelIcons[level];
-    const now = new Date();
-    const isoTimestamp = now.toISOString(); // Keep ISO format for file logs
-    const readableTimestamp = formatDate(
-      now,
-      this.config.use24HourFormat,
-      this.config.useRelativeTime
-    );
-    const timestamp = this.config.prettyPrint ? readableTimestamp : isoTimestamp;
-    const colorizedTimestamp = this.config.colorize ? chalk.gray(timestamp) : timestamp;
-    const colorizedLevel = this.config.colorize ? this.levelColors[level](level.toUpperCase()) : level.toUpperCase();
-    const colorizedMessage = this.config.colorize ? chalk.whiteBright(message) : message;
 
     // Process context - handle errors specially
     let processedContext = { ...context };
     if (context.error instanceof Error) {
       processedContext = {
         ...processedContext,
-        ...formatError(context.error, this.config)
+        ...formatError(context.error, this.config.includeStackTrace)
       };
       delete processedContext.error;
     }
 
-    // Construct console output
-    let consoleOutput = `\n${icon}  ${colorizedLevel}  ${colorizedTimestamp}\n  ➤ ${colorizedMessage}`;
-    if (Object.keys(processedContext).length) {
-      for (const [key, value] of Object.entries(processedContext)) {
-        const formattedValue = typeof value === 'object' && value !== null
-          ? safeStringify(value)
-          : String(value);
-        const colorizedKey = this.config.colorize ? chalk.gray(key) : key;
-        const colorizedValue = this.config.colorize ? chalk.cyan(formattedValue) : formattedValue;
-        consoleOutput += `\n    • ${colorizedKey}: ${colorizedValue}`;
-      }
-    }
-    const divider = this.config.colorize ? chalk.dim('\n────────────────────────────────────') : '\n────────────────────────────────────';
-    consoleOutput += divider;
+    // Get timestamp
+    const timestamp = new Date().toISOString();
 
-    // Output to console
-    console.log(consoleOutput);
-
-    // Write to log file if configured
-    if (this.config.logToFile) {
-      // Create a plain text version for the file - always use ISO format for machine readability
-      let fileEntry = `[${isoTimestamp}] ${level.toUpperCase()}: ${message}`;
-      if (Object.keys(processedContext).length) {
-        fileEntry += ` | ${safeStringify(processedContext)}`;
-      }
-      this.writeToLogFile(fileEntry);
+    // Send to all transports
+    for (const transport of this.transports) {
+      transport.log(level, message, timestamp, processedContext);
     }
   }
 
@@ -231,15 +108,19 @@ export class Logger {
   public debug(msg: string, ctx?: Record<string, any>): void {
     this.log('debug', msg, ctx);
   }
+
   public info(msg: string, ctx?: Record<string, any>): void {
     this.log('info', msg, ctx);
   }
+
   public warn(msg: string, ctx?: Record<string, any>): void {
     this.log('warn', msg, ctx);
   }
+
   public error(msg: string, ctx?: Record<string, any>): void {
     this.log('error', msg, ctx);
   }
+
   public fatal(msg: string, ctx?: Record<string, any>): void {
     this.log('fatal', msg, ctx);
   }
@@ -255,23 +136,163 @@ export class Logger {
   }
 
   /**
+   * Explicitly log sensitive data with approval information
+   * This method should only be used in exceptional circumstances where logging sensitive data is necessary
+   * @param level Log level
+   * @param message Log message
+   * @param data Data containing sensitive information
+   * @param approval Approval information for logging sensitive data
+   */
+  public logWithSensitiveData(
+    level: LogLevel,
+    message: string,
+    data: Record<string, any>,
+    approval: SensitiveLoggingApproval
+  ): void {
+    // Validate approval
+    if (!approval.reason || !approval.approvedBy) {
+      this.warn('Attempted to log sensitive data without proper approval', {
+        message: 'Missing required approval information. Sensitive data will not be logged.'
+      });
+      return;
+    }
+
+    // Check if approval has expired
+    if (approval.expiresAt && new Date() > approval.expiresAt) {
+      this.warn('Attempted to log sensitive data with expired approval', {
+        message: 'Approval has expired. Sensitive data will not be logged.',
+        expiredAt: approval.expiresAt
+      });
+      return;
+    }
+
+    // Add approval information to the context
+    const contextWithApproval = {
+      ...data,
+      __sensitive_data_approval__: {
+        reason: approval.reason,
+        approvedBy: approval.approvedBy,
+        approvedAt: new Date().toISOString(),
+        expiresAt: approval.expiresAt ? approval.expiresAt.toISOString() : undefined
+      }
+    };
+
+    // Log with a warning prefix to make it stand out
+    const warningPrefix = '⚠️ SENSITIVE DATA ⚠️ ';
+    this.log(level, `${warningPrefix}${message}`, contextWithApproval);
+  }
+
+  /**
+   * Convenience method for logging sensitive data with info level
+   */
+  public infoWithSensitiveData(
+    message: string,
+    data: Record<string, any>,
+    approval: SensitiveLoggingApproval
+  ): void {
+    this.logWithSensitiveData('info', message, data, approval);
+  }
+
+  /**
+   * Convenience method for logging sensitive data with error level
+   */
+  public errorWithSensitiveData(
+    message: string,
+    data: Record<string, any>,
+    approval: SensitiveLoggingApproval
+  ): void {
+    this.logWithSensitiveData('error', message, data, approval);
+  }
+
+  /**
    * Update the logger's configuration dynamically
    * @param options Partial configuration options to update
    */
   public configure(options: Partial<LoggerConfig>): void {
+    // We don't need oldConfig for now, but it might be useful for future comparisons
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const oldConfig = { ...this.config };
     this.config = { ...this.config, ...options };
-    // Re-merge colors and icons in case they were updated
-    this.levelColors = { ...DEFAULT_LEVEL_COLORS, ...(this.config.levelColors || {}) };
-    this.levelIcons = { ...DEFAULT_LEVEL_ICONS, ...(this.config.levelIcons || {}) };
 
-    // Ensure log directory exists if file logging was just enabled or path changed
-    if (options.logToFile === true || (options.logFilePath && this.config.logToFile)) {
-      try {
-        ensureLogDirectoryExists(this.config.logFilePath);
-      } catch (error: any) {
-        console.error(`Failed to create log directory '${path.dirname(this.config.logFilePath)}': ${error.message}`);
-        this.config.logToFile = false;
+    // Update formatter if provided
+    if (options.formatter) {
+      this.formatter = options.formatter;
+    }
+
+    // Reinitialize transports if relevant config changed
+    const transportConfigChanged =
+      options.transports !== undefined ||
+      options.logToFile !== undefined ||
+      options.logFilePath !== undefined ||
+      options.prettyPrint !== undefined ||
+      options.colorize !== undefined ||
+      options.use24HourFormat !== undefined ||
+      options.useRelativeTime !== undefined ||
+      options.levelColors !== undefined ||
+      options.levelIcons !== undefined;
+
+    if (transportConfigChanged) {
+      this.initializeTransports();
+    }
+  }
+
+  /**
+   * Set the log level dynamically
+   * @param level New log level to set
+   */
+  public setLevel(level: LogLevel): void {
+    this.configure({ level });
+  }
+
+  /**
+   * Update configuration options dynamically
+   * @param options Partial configuration options to update
+   * @alias configure - Provided for API consistency
+   */
+  public updateConfig(options: Partial<LoggerConfig>): void {
+    this.configure(options);
+  }
+
+  /**
+   * Add a transport to the logger
+   * @param transport Transport to add
+   */
+  public addTransport(transport: Transport): void {
+    this.transports.push(transport);
+  }
+
+  /**
+   * Remove a transport from the logger by name
+   * @param name Name of the transport to remove
+   * @returns Whether the transport was found and removed
+   */
+  public removeTransport(name: string): boolean {
+    const initialLength = this.transports.length;
+    this.transports = this.transports.filter(t => t.name !== name);
+    return this.transports.length < initialLength;
+  }
+
+  /**
+   * Set the formatter for the logger
+   * @param formatter Formatter to use
+   */
+  public setFormatter(formatter: Formatter): void {
+    this.formatter = formatter;
+  }
+
+  /**
+   * Clean up resources used by the logger
+   * Should be called when the logger is no longer needed
+   */
+  public cleanup(): void {
+    // Clean up all transports
+    for (const transport of this.transports) {
+      if (transport.cleanup) {
+        transport.cleanup();
       }
     }
+
+    // Clear transports array
+    this.transports = [];
   }
 }

@@ -1,4 +1,6 @@
 import chalk from 'chalk';
+import { Transport } from './transports';
+import { Formatter } from './formatters';
 
 // Define log levels and their priority (lower number = higher priority)
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'fatal';
@@ -40,6 +42,8 @@ export interface LoggerConfig {
   useRelativeTime: boolean;
   levelColors?: Partial<Record<LogLevel, (text: string) => string>>; // Allow overriding defaults
   levelIcons?: Partial<Record<LogLevel, string>>; // Allow overriding defaults
+  transports?: Transport[]; // Custom transports
+  formatter?: Formatter; // Custom formatter
 }
 
 export const DEFAULT_LOGGER_CONFIG: LoggerConfig = {
