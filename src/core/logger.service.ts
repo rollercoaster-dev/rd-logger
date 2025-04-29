@@ -90,7 +90,7 @@ export class Logger {
     if (context.error instanceof Error) {
       processedContext = {
         ...processedContext,
-        ...formatError(context.error, this.config)
+        ...formatError(context.error, this.config.includeStackTrace)
       };
       delete processedContext.error;
     }
