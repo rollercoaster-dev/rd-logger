@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.2.0](https://github.com/rollercoaster-dev/rd-logger/compare/v0.1.0...v0.2.0) (2025-04-29)
+
+
+### Features
+
+* implement logger improvements - dynamic config, async file logging, and extensibility ([b89968b](https://github.com/rollercoaster-dev/rd-logger/commit/b89968b249792ff1f0b1a806e33175cc51f2c921))
+* implement sensitive data protection ([98a390e](https://github.com/rollercoaster-dev/rd-logger/commit/98a390e91c1f9a9d41d3002a28f810ae75e92072))
+
+
+### Bug Fixes
+
+* add error handling around file transport initialization ([0a21254](https://github.com/rollercoaster-dev/rd-logger/commit/0a212548fedcb02bfdb7c1037e094aeeed9b689f))
+* correct formatError parameter type ([6c8a5c6](https://github.com/rollercoaster-dev/rd-logger/commit/6c8a5c6569f276c85e04c4c57c9e9836c172f966))
+* fix linting errors and add pre-push hooks for typecheck and linting ([d5fe0b0](https://github.com/rollercoaster-dev/rd-logger/commit/d5fe0b0b18f27d2492716baf6929414637e491d1))
+
 ## 0.1.0 (2025-04-24)
 
 
