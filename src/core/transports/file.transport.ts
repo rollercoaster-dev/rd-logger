@@ -21,6 +21,7 @@ export interface FileTransportOptions {
 export class FileTransport implements Transport {
   public name = 'file';
   private filePath: string;
+  private initialized = false;
   private fileStream: fs.WriteStream | null = null;
   private logQueue: string[] = [];
   private isProcessingQueue = false;
@@ -30,12 +31,13 @@ export class FileTransport implements Transport {
   }
 
   /**
-   * Initialize the file transport
+   * Initialize the file transport (called lazily)
    */
   public initialize(): void {
     try {
       this.ensureLogDirectoryExists();
       this.initializeFileStream();
+      this.initialized = true;
     } catch (error: any) {
       console.error(`Failed to initialize file transport: ${error.message}`);
     }
@@ -45,6 +47,16 @@ export class FileTransport implements Transport {
    * Log a message to the file
    */
   public log(level: string, message: string, timestamp: string, context: Record<string, any>): void {
+    // Initialize lazily on first log attempt
+    if (!this.initialized) {
+      this.initialize();
+      // If initialization failed, fileStream will be null, and we can't log
+      if (!this.initialized) {
+        console.warn('FileTransport: Cannot log, initialization failed.');
+        return;
+      }
+    }
+
     // Create a plain text version for the file - always use ISO format for machine readability
     let fileEntry = `[${timestamp}] ${level.toUpperCase()}: ${message}`;
     if (Object.keys(context).length) {
