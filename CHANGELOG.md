@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.1](https://github.com/rollercoaster-dev/rd-logger/compare/v0.2.0...v0.2.1) (2025-05-03)
+
+
+### Bug Fixes
+
+* lazily initialize FileTransport to prevent path errors during module load ([58d6fdd](https://github.com/rollercoaster-dev/rd-logger/commit/58d6fdd44a9cb17126cc174141f82300bb29724a))
+
 ## [0.2.0](https://github.com/rollercoaster-dev/rd-logger/compare/v0.1.0...v0.2.0) (2025-04-29)
 
 
