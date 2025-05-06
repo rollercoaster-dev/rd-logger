@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.3.0](https://github.com/rollercoaster-dev/rd-logger/compare/v0.2.1...v0.3.0) (2025-05-06)
+
+
+### Features
+
+* Configure package.json exports and add vitest for validation ([041436a](https://github.com/rollercoaster-dev/rd-logger/commit/041436ac02244af54ee2cf0b96e3f2915ee68bcf))
+
 ### [0.2.1](https://github.com/rollercoaster-dev/rd-logger/compare/v0.2.0...v0.2.1) (2025-05-03)
 
 
