@@ -37,13 +37,5 @@ describe('@rollercoaster-dev/rd-logger public API via exports map', () => {
     // expect(loggerServiceApi.SensitiveValue).toBeDefined(); // Or use the direct import above.
   });
 
-  // Example for testing a specific named export like SensitiveValue from the submodule
-  // (This might be redundant if you only expect SensitiveValue from the main export)
-  // it('should make SensitiveValue available from core/logger.service', () => {
-  //   // To test this, you'd uncomment the specific import for SensitiveValue above:
-  //   // import { SensitiveValue } from '@rollercoaster-dev/rd-logger/core/logger.service';
-  //   expect(SensitiveValue).toBeDefined();
-  //   // You might also check its type or if it's a class constructor
-  //   // expect(typeof SensitiveValue).toBe('function'); // If it's a class or function
-  // });
+// (Commented-out test block removed to maintain a clean and focused test file)
 });
