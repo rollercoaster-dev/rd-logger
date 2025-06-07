@@ -10,17 +10,18 @@ export const LOG_LEVEL_PRIORITY: Record<LogLevel, number> = {
   info: 1,
   warn: 2,
   error: 3,
-  fatal: 4
+  fatal: 4,
 };
 
 // Define colors for each log level
-export const DEFAULT_LEVEL_COLORS: Record<LogLevel, (text: string) => string> = {
-  debug: chalk.blue,
-  info: chalk.green,
-  warn: chalk.yellow,
-  error: chalk.red,
-  fatal: chalk.magenta
-};
+export const DEFAULT_LEVEL_COLORS: Record<LogLevel, (text: string) => string> =
+  {
+    debug: chalk.blue,
+    info: chalk.green,
+    warn: chalk.yellow,
+    error: chalk.red,
+    fatal: chalk.magenta,
+  };
 
 // Define icons for each log level
 export const DEFAULT_LEVEL_ICONS: Record<LogLevel, string> = {
@@ -28,7 +29,7 @@ export const DEFAULT_LEVEL_ICONS: Record<LogLevel, string> = {
   info: '🟢',
   warn: '🟡',
   error: '🔴',
-  fatal: '💀'
+  fatal: '💀',
 };
 
 export interface LoggerConfig {
@@ -39,7 +40,6 @@ export interface LoggerConfig {
   logToFile: boolean;
   logFilePath: string;
   use24HourFormat: boolean;
-  useRelativeTime: boolean;
   levelColors?: Partial<Record<LogLevel, (text: string) => string>>; // Allow overriding defaults
   levelIcons?: Partial<Record<LogLevel, string>>; // Allow overriding defaults
   transports?: Transport[]; // Custom transports
@@ -54,5 +54,4 @@ export const DEFAULT_LOGGER_CONFIG: LoggerConfig = {
   logToFile: false, // Default to console logging
   logFilePath: './app.log', // Default log file path
   use24HourFormat: true, // Default to 24-hour format
-  useRelativeTime: true // Default to using relative time for recent logs
 };
