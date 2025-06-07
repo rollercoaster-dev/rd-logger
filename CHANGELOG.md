@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.1](https://github.com/rollercoaster-dev/rd-logger/compare/v0.3.0...v0.3.1) (2025-06-07)
+
+
+### Features
+
+* enhance logger functionality with precise timestamp formatting and remove relative time option ([abb2e14](https://github.com/rollercoaster-dev/rd-logger/commit/abb2e14dd51961f3ba6413862794e55bfffb1a65))
+
 ## [0.3.0](https://github.com/rollercoaster-dev/rd-logger/compare/v0.2.1...v0.3.0) (2025-05-06)
 
 
