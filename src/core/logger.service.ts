@@ -43,7 +43,6 @@ export class Logger {
           prettyPrint: this.config.prettyPrint,
           colorize: this.config.colorize,
           use24HourFormat: this.config.use24HourFormat,
-          useRelativeTime: this.config.useRelativeTime,
           levelColors: this.config.levelColors,
           levelIcons: this.config.levelIcons,
         })
@@ -67,7 +66,11 @@ export class Logger {
    * @param message Log message
    * @param context Additional context (optional)
    */
-  public log(level: LogLevel, message: string, context: Record<string, any> = {}): void {
+  public log(
+    level: LogLevel,
+    message: string,
+    context: Record<string, any> = {}
+  ): void {
     // Check if this log level should be shown based on configuration
     // In LOG_LEVEL_PRIORITY, higher values mean less verbose (debug=0, fatal=4)
     // So we only log if the message level value is >= the configured level value
@@ -81,7 +84,7 @@ export class Logger {
     if (context.error instanceof Error) {
       processedContext = {
         ...processedContext,
-        ...formatError(context.error, this.config.includeStackTrace)
+        ...formatError(context.error, this.config.includeStackTrace),
       };
       delete processedContext.error;
     }
@@ -122,7 +125,11 @@ export class Logger {
    * @param error Error object
    * @param additionalContext Additional context (optional)
    */
-  public logError(msg: string, error: Error, additionalContext: Record<string, any> = {}): void {
+  public logError(
+    msg: string,
+    error: Error,
+    additionalContext: Record<string, any> = {}
+  ): void {
     this.log('error', msg, { ...additionalContext, error });
   }
 
@@ -143,7 +150,8 @@ export class Logger {
     // Validate approval
     if (!approval.reason || !approval.approvedBy) {
       this.warn('Attempted to log sensitive data without proper approval', {
-        message: 'Missing required approval information. Sensitive data will not be logged.'
+        message:
+          'Missing required approval information. Sensitive data will not be logged.',
       });
       return;
     }
@@ -152,7 +160,7 @@ export class Logger {
     if (approval.expiresAt && new Date() > approval.expiresAt) {
       this.warn('Attempted to log sensitive data with expired approval', {
         message: 'Approval has expired. Sensitive data will not be logged.',
-        expiredAt: approval.expiresAt
+        expiredAt: approval.expiresAt,
       });
       return;
     }
@@ -164,8 +172,10 @@ export class Logger {
         reason: approval.reason,
         approvedBy: approval.approvedBy,
         approvedAt: new Date().toISOString(),
-        expiresAt: approval.expiresAt ? approval.expiresAt.toISOString() : undefined
-      }
+        expiresAt: approval.expiresAt
+          ? approval.expiresAt.toISOString()
+          : undefined,
+      },
     };
 
     // Log with a warning prefix to make it stand out
@@ -218,7 +228,6 @@ export class Logger {
       options.prettyPrint !== undefined ||
       options.colorize !== undefined ||
       options.use24HourFormat !== undefined ||
-      options.useRelativeTime !== undefined ||
       options.levelColors !== undefined ||
       options.levelIcons !== undefined;
 
@@ -259,7 +268,7 @@ export class Logger {
    */
   public removeTransport(name: string): boolean {
     const initialLength = this.transports.length;
-    this.transports = this.transports.filter(t => t.name !== name);
+    this.transports = this.transports.filter((t) => t.name !== name);
     return this.transports.length < initialLength;
   }
 

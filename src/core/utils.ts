@@ -9,27 +9,35 @@ import { containsSensitiveData, redactSensitiveData } from './sensitive';
  */
 export function safeStringify(obj: any, detectPatterns = true): string {
   const seen = new Set();
-  return JSON.stringify(obj, (_key, value) => {
-    // Handle circular references
-    if (typeof value === 'object' && value !== null) {
-      if (seen.has(value)) {
-        return '[Circular]';
+  return JSON.stringify(
+    obj,
+    (_key, value) => {
+      // Handle circular references
+      if (typeof value === 'object' && value !== null) {
+        if (seen.has(value)) {
+          return '[Circular]';
+        }
+        seen.add(value);
+
+        // Handle SensitiveValue instances
+        if (value instanceof SensitiveValue) {
+          return value.toString();
+        }
       }
-      seen.add(value);
 
-      // Handle SensitiveValue instances
-      if (value instanceof SensitiveValue) {
-        return value.toString();
+      // Handle string values that might contain sensitive data
+      if (
+        detectPatterns &&
+        typeof value === 'string' &&
+        containsSensitiveData(value)
+      ) {
+        return redactSensitiveData(value);
       }
-    }
 
-    // Handle string values that might contain sensitive data
-    if (detectPatterns && typeof value === 'string' && containsSensitiveData(value)) {
-      return redactSensitiveData(value);
-    }
-
-    return value;
-  }, 2);
+      return value;
+    },
+    2
+  );
 }
 
 /**
@@ -38,9 +46,12 @@ export function safeStringify(obj: any, detectPatterns = true): string {
  * @param includeStackTrace Whether to include stack traces
  * @returns Formatted error context
  */
-export function formatError(error: Error, includeStackTrace = true): Record<string, string> {
+export function formatError(
+  error: Error,
+  includeStackTrace = true
+): Record<string, string> {
   const errorContext: Record<string, string> = {
-    message: error.message
+    message: error.message,
   };
 
   if (includeStackTrace && error.stack) {
@@ -48,7 +59,7 @@ export function formatError(error: Error, includeStackTrace = true): Record<stri
     errorContext.stack = error.stack
       .split('\n')
       .slice(1) // Remove the first line (error message)
-      .map(line => line.trim())
+      .map((line) => line.trim())
       .join('\n');
   }
 
@@ -56,46 +67,27 @@ export function formatError(error: Error, includeStackTrace = true): Record<stri
 }
 
 /**
- * Get a relative time string (e.g., "just now", "2 minutes ago")
- * @param date Date to format
- * @returns Relative time string or null if the time difference is too large
- */
-export function getRelativeTimeString(date: Date): string | null {
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffSeconds = Math.floor(diffMs / 1000);
-
-  // Only show relative time for recent events (within the last hour)
-  if (diffSeconds < 5) {
-    return 'just now';
-  } else if (diffSeconds < 60) {
-    return `${diffSeconds} seconds ago`;
-  } else if (diffSeconds < 3600) {
-    const minutes = Math.floor(diffSeconds / 60);
-    return `${minutes} ${minutes === 1 ? 'minute' : 'minutes'} ago`;
-  }
-
-  return null; // Not recent enough for relative time
-}
-
-/**
  * Format a date in a human-readable format
  * @param date Date to format
  * @param use24HourFormat Whether to use 24-hour format
- * @param useRelativeTime Whether to use relative time for recent events
  * @returns Formatted date string
  */
-export function formatDate(date: Date, use24HourFormat = true, useRelativeTime = true): string {
-  // Try relative time first if enabled
-  if (useRelativeTime) {
-    const relativeTime = getRelativeTimeString(date);
-    if (relativeTime) {
-      return relativeTime;
-    }
-  }
-
-  // Otherwise, format as date and time
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+export function formatDate(date: Date, use24HourFormat = true): string {
+  // Format as date and time
+  const months = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
   const month = months[date.getMonth()];
   const day = date.getDate();
   const hours = date.getHours();
@@ -105,7 +97,9 @@ export function formatDate(date: Date, use24HourFormat = true, useRelativeTime =
 
   if (use24HourFormat) {
     // 24-hour format
-    return `${month} ${day}, ${hours.toString().padStart(2, '0')}:${minutes}:${seconds}.${milliseconds}`;
+    return `${month} ${day}, ${hours
+      .toString()
+      .padStart(2, '0')}:${minutes}:${seconds}.${milliseconds}`;
   } else {
     // 12-hour format with AM/PM
     const ampm = hours >= 12 ? 'PM' : 'AM';

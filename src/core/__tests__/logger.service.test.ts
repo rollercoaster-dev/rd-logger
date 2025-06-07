@@ -83,8 +83,10 @@ describe('Logger Service', () => {
     const logOutput = consoleSpy.mock.calls[0][0];
     expect(logOutput).toContain('INFO');
     expect(logOutput).toContain('Test info message');
-    // Check for human-readable relative timestamp
-    expect(logOutput).toMatch(/just now/);
+    // Check for human-readable timestamp format (e.g., "Jun 7, 19:01:33.484")
+    expect(logOutput).toMatch(
+      /[A-Z][a-z]{2} \d{1,2}, \d{2}:\d{2}:\d{2}\.\d{3}/
+    );
   });
 
   it('should log a warn message to console', () => {
